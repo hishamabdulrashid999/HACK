@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>System Terminal</title>
+<style>
+    *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+body{
+
+    background:#020202;
+    color:#00ff66;
+
+    font-family:
+    Consolas,
+    "Courier New",
+    monospace;
+
+    overflow:hidden;
+    position:relative;
+
+}
+
+
+
+/* =====================
+      MATRIX CANVAS
+===================== */
+
+#matrix{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    z-index:0;
+
+    opacity:.25;
+
+}
+
+
+
+/* =====================
+      SCAN LINES
+===================== */
+
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+    repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,100,.04) 3px
+    );
+
+
+    pointer-events:none;
+
+    z-index:3;
+
+}
+
+
+
+/* =====================
+      GREEN GLOW
+===================== */
+
+
+body::after{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+
+    background:
+    radial-gradient(
+        circle,
+        rgba(0,255,80,.15),
+        transparent 65%
+    );
+
+
+    filter:blur(80px);
+
+    pointer-events:none;
+
+    z-index:1;
+
+}
+
+
+
+/* =====================
+      TERMINAL
+===================== */
+
+
+#terminal{
+
+    position:relative;
+
+    z-index:5;
+
+
+    height:100vh;
+
+    overflow:auto;
+
+
+    padding:35px;
+
+
+    font-size:22px;
+
+
+    line-height:1.7;
+
+
+    text-shadow:
+
+    0 0 5px #00ff55,
+    0 0 15px #00ff55,
+    0 0 30px #00ff55;
+
+
+}
+
+
+
+/* HEADER */
+
+#terminal::before{
+
+    content:
+    "SYSTEM TERMINAL v4.8";
+
+
+    display:block;
+
+
+    color:#00ffaa;
+
+
+    font-size:25px;
+
+
+    letter-spacing:5px;
+
+
+    border-bottom:
+
+    1px solid #00ff55;
+
+
+    padding-bottom:15px;
+
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+/* =====================
+       CURSOR
+===================== */
+
+
+.cursor{
+
+    color:#00ffaa;
+
+    animation:
+    blink .8s infinite;
+
+}
+
+
+@keyframes blink{
+
+
+    50%{
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+/* =====================
+       RANDOM GLITCH
+===================== */
+
+
+.glitch{
+
+    animation:
+    glitch .08s infinite;
+
+}
+
+
+
+@keyframes glitch{
+
+
+0%{
+
+transform:
+translate(0);
+
+}
+
+
+20%{
+
+transform:
+translate(-4px,2px);
+
+}
+
+
+40%{
+
+transform:
+translate(3px,-3px);
+
+}
+
+
+60%{
+
+transform:
+translate(-3px,1px);
+
+}
+
+
+80%{
+
+transform:
+translate(4px,-2px);
+
+}
+
+
+100%{
+
+transform:
+translate(0);
+
+}
+
+
+
+}
+
+
+
+/* =====================
+       FLASH EFFECT
+===================== */
+
+
+.flash{
+
+
+    animation:
+    flash .15s;
+
+
+}
+
+
+
+@keyframes flash{
+
+
+0%{
+
+background:#00ff66;
+
+}
+
+
+100%{
+
+background:#020202;
+
+}
+
+
+
+}
+
+
+
+/* =====================
+       SCROLL BAR
+===================== */
+
+
+#terminal::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+
+#terminal::-webkit-scrollbar-thumb{
+
+    background:#00ff55;
+
+    box-shadow:
+    0 0 10px #00ff55;
+
+}
+</style>
+
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="terminal"></div>
+
+<script>
+const lines = [
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> BOOTING SYSTEM CORE...",
+"> $$$$$$$@unknown:~$ initialize",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> eDu4gieft8975^%^&*^r6u324ehd",
+
+"> mostafaahmed9@gmail.com:~$ initialize",
+"> Loading neural interface...",
+"> eDu4gief%^&*^r6u324ehd",
+"> eDu4gieft897324ehd",
+"> ecf7y346cvrwgt6w4t^$%$&6&#oytgery 643536",
+
+
+"> Initializing unknown modules...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> Scanning digital environment...",
+"> Checking encrypted channels...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> password == 123456 && abcd && 102030405060708090",
+"> --------------------------------",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> ACCESS REQUEST RECEIVED...",
+"> Ahmed && Mostafa",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> Identity verification required...",
+"> Searching database...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> 734,982 records found...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> Encryption level: MAXIMUM",
+
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> Anomaly detected in system layer...",
+"> Isolating unknown process...",
+"> Creating virtual firewall...",
+"> System stability: 87%",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+
+"> --------------------------------",
+
+"> SYSTEM MESSAGE:",
+"> Something is watching...",
+"> Connection is not ordinary...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> Unknown source detected...",
+"> Origin: CLASSIFIED",
+
+"> --------------------------------",
+"> WARNING: UNRECOGNIZED SIGNAL DETECTED...",
+"> Loading final sequence...",
+"> Decoding encrypted messages...",
+"> Memory sectors synchronized...",
+"> Artificial intelligence online...",
+
+"> STATUS: ACTIVE",
+"> STATUS: MONITORING",
+"> STATUS: WAITING",
+
+"> --------------------------------",
+
+"> root@unknown:~$ initialize",
+"> root@unknown:~$ loading secrets...",
+"> root@unknown:~$ access confirmed",
+
+"> END OF TRANSMISSION..."
+
+];
+
+
+
+const terminal = document.getElementById("terminal");
+
+let line = 0;
+
+
+
+/* =====================
+      MATRIX RAIN
+===================== */
+
+
+const canvas = document.getElementById("matrix");
+
+const ctx = canvas.getContext("2d");
+
+
+
+function resizeCanvas(){
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+}
+
+
+resizeCanvas();
+
+
+
+const chars =
+"101010101010101010101110101010101101010100101101010101001";
+
+const fontSize = 18;
+
+
+let columns =
+Math.floor(canvas.width / fontSize);
+
+
+
+let drops = [];
+
+
+
+function resetDrops(){
+
+    columns =
+    Math.floor(canvas.width / fontSize);
+
+
+    drops=[];
+
+
+    for(let i=0;i<columns;i++){
+
+        drops[i] =
+        Math.random()*canvas.height/fontSize;
+
+    }
+
+}
+
+
+resetDrops();
+
+
+
+function drawMatrix(){
+
+
+    ctx.fillStyle =
+    "rgba(0,0,0,0.06)";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+
+    ctx.font =
+    fontSize+"px Consolas";
+
+
+
+    for(let i=0;i<drops.length;i++){
+
+
+        let text =
+        chars[
+        Math.floor(
+        Math.random()*chars.length
+        )
+        ];
+
+
+
+        // رأس العمود
+
+        ctx.fillStyle="#ffffff";
+
+
+        ctx.fillText(
+            text,
+            i*fontSize,
+            drops[i]*fontSize
+        );
+
+
+
+        // باقي العمود
+
+        ctx.fillStyle="#00ff55";
+
+
+
+        drops[i]++;
+
+
+
+        if(
+        drops[i]*fontSize > canvas.height
+        &&
+        Math.random()>0.975
+        ){
+
+            drops[i]=0;
+
+        }
+
+
+    }
+
+
+}
+
+
+
+setInterval(drawMatrix,35);
+
+
+
+window.addEventListener(
+"resize",
+()=>{
+
+    resizeCanvas();
+
+    resetDrops();
+
+});
+
+
+
+
+
+/* =====================
+      TERMINAL TYPING
+===================== */
+
+
+
+function typeLine(){
+
+
+    if(line >= lines.length){
+
+        return;
+
+    }
+
+
+
+    let text = lines[line];
+
+
+    let p =
+    document.createElement("div");
+
+
+
+    terminal.appendChild(p);
+
+
+
+    let i=0;
+
+
+
+    let writer =
+    setInterval(()=>{
+
+
+
+        p.innerHTML =
+        text.substring(0,i)
+        +
+        "<span class='cursor'>█</span>";
+
+
+
+        i++;
+
+
+
+        if(i > text.length){
+
+
+            clearInterval(writer);
+
+
+            p.textContent=text;
+
+
+
+            if(text.includes("WARNING")){
+
+
+                randomGlitch(600);
+
+
+            }
+
+
+
+            line++;
+
+
+
+            setTimeout(
+            typeLine,
+            10
+            );
+
+
+        }
+
+
+
+    },12);
+
+
+
+}
+
+
+
+typeLine();
+
+
+
+
+
+/* =====================
+      RANDOM GLITCH
+===================== */
+
+
+function randomGlitch(duration){
+
+
+
+    let effect =
+    setInterval(()=>{
+
+
+        let x =
+        Math.random()*10-5;
+
+
+        let y =
+        Math.random()*10-5;
+
+
+
+        let rotate =
+        Math.random()*10-5;
+
+
+
+        document.body.style.transform =
+
+        `translate(${x}px,${y}px)
+        rotate(${rotate}deg)`;
+
+
+
+        document.body.style.filter =
+
+        `hue-rotate(${Math.random()*40}deg)`;
+
+
+    },40);
+
+
+
+
+    setTimeout(()=>{
+
+
+        clearInterval(effect);
+
+
+
+        document.body.style.transform="";
+
+
+        document.body.style.filter="";
+
+
+    },duration);
+
+
+
+}
+</script>
+
+</body>
+
+</html>
